@@ -28,4 +28,12 @@ public class UserDataService {
         .orElseThrow(
             () -> new EntityNotFoundException("User data with id " + id + " not found"));
   }
+
+  public UserData updateUserData(UserData userData) {
+    return userDataRepository.saveAndFlush(userData);
+  }
+
+  public void deleteUserData(Long id) {
+    userDataRepository.deleteById(id);
+  }
 }

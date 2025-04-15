@@ -27,4 +27,12 @@ public class AccountDataService {
         .orElseThrow(
             () -> new EntityNotFoundException("Account data with id " + id + " not found"));
   }
+
+  public AccountData updateAccountData(AccountData accountData) {
+    return accountDataRepository.saveAndFlush(accountData);
+  }
+
+  public void deleteAccountData(Long id) {
+    accountDataRepository.deleteById(id);
+  }
 }

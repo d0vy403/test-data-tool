@@ -26,4 +26,8 @@ public class UserLoginMethodService {
         .orElseThrow(
             () -> new EntityNotFoundException("User login method with id " + id + " not found"));
   }
+
+  public void deleteUserLoginMethod(Long id) {
+    userLoginMethodRespository.deleteById(id);
+  }
 }

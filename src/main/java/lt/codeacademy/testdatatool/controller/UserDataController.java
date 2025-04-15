@@ -27,13 +27,29 @@ public class UserDataController {
         return new ResponseEntity<>(userDataService.getUserData(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserData> getUserDataById(@PathVariable Long id) {
+  @GetMapping("/{id}")
+  public ResponseEntity<UserData> getUserDataById(@PathVariable Long id) {
         try {
             UserData userData = userDataService.getUserDataById(id);
             return new ResponseEntity<>(userData, HttpStatus.OK);
         } catch (HttpClientErrorException.NotFound e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserData> updateUserData(@PathVariable Long id, @RequestBody UserData userData) {
+        try {
+            userData.setId(id);
+            UserData updatedUserData = userDataService.updateUserData(userData);
+            return new ResponseEntity<>(updatedUserData, HttpStatus.OK);
+        } catch (HttpClientErrorException.NotFound e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserData(@PathVariable Long id) {
+        userDataService.deleteUserData(id);
     }
 }

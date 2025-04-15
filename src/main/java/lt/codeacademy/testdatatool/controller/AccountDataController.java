@@ -35,4 +35,22 @@ public class AccountDataController {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
   }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<AccountData> updateAccountData(
+      @PathVariable Long id, @RequestBody AccountData accountData) {
+    try {
+      accountData.setId(id);
+      AccountData updatedAccountData = accountDataService.updateAccountData(accountData);
+      return new ResponseEntity<>(updatedAccountData, HttpStatus.OK);
+    } catch (HttpClientErrorException.NotFound e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<AccountData> deleteAccountData(@PathVariable Long id) {
+    accountDataService.deleteAccountData(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 }

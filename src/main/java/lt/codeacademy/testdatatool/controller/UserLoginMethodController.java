@@ -13,26 +13,32 @@ import org.springframework.web.client.HttpClientErrorException;
 @RequestMapping("/api/user-login-method")
 @RequiredArgsConstructor
 public class UserLoginMethodController {
-    private final UserLoginMethodService userLoginMethodService;
+  private final UserLoginMethodService userLoginMethodService;
 
-    @PostMapping
-    public ResponseEntity<UserLoginMethod> addUserLoginMethod(@RequestBody UserLoginMethod userLoginMethod) {
-        UserLoginMethod newUserLoginMethod = userLoginMethodService.addUserLoginMethod(userLoginMethod);
-        return new ResponseEntity<>(newUserLoginMethod, HttpStatus.CREATED);
-    }
+  @PostMapping
+  public ResponseEntity<UserLoginMethod> addUserLoginMethod(
+      @RequestBody UserLoginMethod userLoginMethod) {
+    UserLoginMethod newUserLoginMethod = userLoginMethodService.addUserLoginMethod(userLoginMethod);
+    return new ResponseEntity<>(newUserLoginMethod, HttpStatus.CREATED);
+  }
 
-    @GetMapping
-    public ResponseEntity<List<UserLoginMethod>> getUserLoginMethods() {
-        return new ResponseEntity<>(userLoginMethodService.getUserLoginMethod(), HttpStatus.OK);
-    }
+  @GetMapping
+  public ResponseEntity<List<UserLoginMethod>> getUserLoginMethods() {
+    return new ResponseEntity<>(userLoginMethodService.getUserLoginMethod(), HttpStatus.OK);
+  }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserLoginMethod> getUserLoginMethodById(@PathVariable Long id) {
-        try{
-            UserLoginMethod userLoginMethod = userLoginMethodService.getUserLoginMethodById(id);
-            return new ResponseEntity<>(userLoginMethod, HttpStatus.OK);
-        } catch (HttpClientErrorException.NotFound e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+  @GetMapping("/{id}")
+  public ResponseEntity<UserLoginMethod> getUserLoginMethodById(@PathVariable Long id) {
+    try {
+      UserLoginMethod userLoginMethod = userLoginMethodService.getUserLoginMethodById(id);
+      return new ResponseEntity<>(userLoginMethod, HttpStatus.OK);
+    } catch (HttpClientErrorException.NotFound e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
+  }
+
+  @DeleteMapping("/{id}")
+  public void deleteUserLoginMethod(@PathVariable Long id) {
+    userLoginMethodService.deleteUserLoginMethod(id);
+  }
 }
