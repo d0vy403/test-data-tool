@@ -30,9 +30,9 @@ public class UserData {
   @Column(nullable = false)
   private Environment environment;
 
-  @OneToMany(mappedBy = "userData", cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "userData", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   private List<AccountData> account;
 
-  @OneToMany(mappedBy = "userData", cascade = CascadeType.PERSIST)
+  @OneToMany(mappedBy = "userData", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   private List<UserLoginMethod> userLoginMethod;
 }
