@@ -29,5 +29,6 @@ public class AccountData {
   @Column(nullable = false)
   private boolean blocked;
 
-  @ManyToOne private UserData userData;
+  @ManyToOne(optional = false)
+  private UserData userData;
 }
