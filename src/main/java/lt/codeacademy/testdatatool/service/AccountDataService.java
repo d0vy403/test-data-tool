@@ -1,6 +1,5 @@
 package lt.codeacademy.testdatatool.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +8,10 @@ import lt.codeacademy.testdatatool.dto.GetAccountDataResponse;
 import lt.codeacademy.testdatatool.dto.UpdateAccountDataRequest;
 import lt.codeacademy.testdatatool.entity.AccountData;
 import lt.codeacademy.testdatatool.entity.UserData;
+import lt.codeacademy.testdatatool.exception.AccountAlreadyExistsException;
+import lt.codeacademy.testdatatool.exception.AccountNotFoundException;
+import lt.codeacademy.testdatatool.exception.InvalidDataException;
+import lt.codeacademy.testdatatool.exception.UserNotFoundException;
 import lt.codeacademy.testdatatool.mapper.AccountDataMapper;
 import lt.codeacademy.testdatatool.repository.AccountDataRepository;
 import lt.codeacademy.testdatatool.repository.UserDataRepository;
@@ -26,11 +29,18 @@ public class AccountDataService {
     UserData userData =
         userDataRepository
             .findById(request.userId())
-            .orElseThrow(() -> new EntityNotFoundException("User data not found"));
-    AccountData accountData = accountDataMapper.toAccountData(request);
-    accountData.setUserData(userData);
-    AccountData savedAccountData = accountDataRepository.saveAndFlush(accountData);
-    return accountDataMapper.toGetAccountDataResponse(savedAccountData);
+            .orElseThrow(() -> new UserNotFoundException(request.userId()));
+    if (accountDataRepository.existsByAccountNumber(request.accountNumber())) {
+      throw new AccountAlreadyExistsException(request.accountNumber());
+    }
+    try {
+      AccountData accountData = accountDataMapper.toAccountData(request);
+      accountData.setUserData(userData);
+      AccountData savedAccountData = accountDataRepository.saveAndFlush(accountData);
+      return accountDataMapper.toGetAccountDataResponse(savedAccountData);
+    } catch (Exception e) {
+      throw new InvalidDataException("Failed to add account data");
+    }
   }
 
   public List<GetAccountDataResponse> getAccountData() {
@@ -43,7 +53,7 @@ public class AccountDataService {
         accountDataRepository
             .findById(id)
             .orElseThrow(
-                () -> new EntityNotFoundException("Account data with id " + id + " not found"));
+                () -> new AccountNotFoundException(id));
     return accountDataMapper.toGetAccountDataResponse(accountData);
   }
 
@@ -52,10 +62,14 @@ public class AccountDataService {
         accountDataRepository
             .findById(id)
             .orElseThrow(
-                () -> new EntityNotFoundException("Account data with id " + id + " not found"));
+                () -> new AccountNotFoundException(id));
     accountDataMapper.updateAccountData(request, accountData);
+    try{
     AccountData updatedAccountData = accountDataRepository.saveAndFlush(accountData);
     return accountDataMapper.toGetAccountDataResponse(updatedAccountData);
+    } catch (Exception e) {
+      throw new InvalidDataException("Failed to update account data");
+    }
   }
 
   @Transactional
@@ -64,7 +78,7 @@ public class AccountDataService {
         accountDataRepository
             .findById(id)
             .orElseThrow(
-                () -> new EntityNotFoundException("Account data with id " + id + " not found"));
+                () -> new AccountNotFoundException(id));
     UserData user = accountData.getUserData();
     user.getAccount().remove(accountData);
   }
