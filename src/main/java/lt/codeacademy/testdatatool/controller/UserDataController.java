@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lt.codeacademy.testdatatool.dto.CreateUserDataRequest;
 import lt.codeacademy.testdatatool.dto.GetUserDataResponse;
 import lt.codeacademy.testdatatool.dto.UpdateUserDataRequest;
+import lt.codeacademy.testdatatool.entity.Channel;
+import lt.codeacademy.testdatatool.entity.Environment;
 import lt.codeacademy.testdatatool.service.UserDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,8 +26,11 @@ public class UserDataController {
   }
 
   @GetMapping
-  public ResponseEntity<List<GetUserDataResponse>> getUserData() {
-    List<GetUserDataResponse> userDataList = userDataService.getUserData();
+  public ResponseEntity<List<GetUserDataResponse>> getUserData(
+      @RequestParam(name = "username", required = false) String userName,
+      @RequestParam(name = "environment", required = false) Environment environment,
+      @RequestParam(name = "channel", required = false) Channel channel) {
+    List<GetUserDataResponse> userDataList = userDataService.getUserData(userName, environment, channel);
     return new ResponseEntity<>(userDataList, HttpStatus.OK);
   }
 

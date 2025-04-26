@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lt.codeacademy.testdatatool.dto.CreateUserLoginMethodRequest;
 import lt.codeacademy.testdatatool.dto.GetUserLoginMethodResponse;
+import lt.codeacademy.testdatatool.entity.Method;
 import lt.codeacademy.testdatatool.service.UserLoginMethodService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,11 @@ public class UserLoginMethodController {
   }
 
   @GetMapping
-  public ResponseEntity<List<GetUserLoginMethodResponse>> getUserLoginMethods() {
+  public ResponseEntity<List<GetUserLoginMethodResponse>> getUserLoginMethods(
+      @RequestParam(name = "method", required = false) Method method,
+      @RequestParam(name = "userid", required = false) Long userId) {
     List<GetUserLoginMethodResponse> userLoginMethodResponseList =
-        userLoginMethodService.getUserLoginMethod();
+        userLoginMethodService.getUserLoginMethod(method, userId);
     return new ResponseEntity<>(userLoginMethodResponseList, HttpStatus.OK);
   }
 

@@ -24,8 +24,12 @@ public class AccountDataController {
   }
 
   @GetMapping
-  public ResponseEntity<List<GetAccountDataResponse>> getAccountData() {
-    List<GetAccountDataResponse> accountData = accountDataService.getAccountData();
+  public ResponseEntity<List<GetAccountDataResponse>> getAccountData(
+      @RequestParam(name = "currency", required = false) String currency,
+      @RequestParam(name = "type", required = false) String type,
+      @RequestParam(name = "userid", required = false) Long userId) {
+    List<GetAccountDataResponse> accountData =
+        accountDataService.getAccountData(currency, type, userId);
     return new ResponseEntity<>(accountData, HttpStatus.OK);
   }
 

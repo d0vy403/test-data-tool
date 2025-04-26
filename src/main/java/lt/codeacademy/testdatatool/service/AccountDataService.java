@@ -43,30 +43,28 @@ public class AccountDataService {
     }
   }
 
-  public List<GetAccountDataResponse> getAccountData() {
-    List<AccountData> accountDataList = accountDataRepository.findAll();
-    return accountDataList.stream().map(accountDataMapper::toGetAccountDataResponse).toList();
+  public List<GetAccountDataResponse> getAccountData(String currency, String type, Long userId) {
+    return accountDataRepository.findAll().stream()
+            .filter(account -> isMatchingCurrency(account, currency))
+            .filter(account -> isMatchingType(account, type))
+            .filter(account -> isMatchingUser(account, userId))
+            .map(accountDataMapper::toGetAccountDataResponse)
+            .toList();
   }
 
   public GetAccountDataResponse getAccountDataById(Long id) {
     AccountData accountData =
-        accountDataRepository
-            .findById(id)
-            .orElseThrow(
-                () -> new AccountNotFoundException(id));
+        accountDataRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
     return accountDataMapper.toGetAccountDataResponse(accountData);
   }
 
   public GetAccountDataResponse updateAccountData(Long id, UpdateAccountDataRequest request) {
     AccountData accountData =
-        accountDataRepository
-            .findById(id)
-            .orElseThrow(
-                () -> new AccountNotFoundException(id));
+        accountDataRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
     accountDataMapper.updateAccountData(request, accountData);
-    try{
-    AccountData updatedAccountData = accountDataRepository.saveAndFlush(accountData);
-    return accountDataMapper.toGetAccountDataResponse(updatedAccountData);
+    try {
+      AccountData updatedAccountData = accountDataRepository.saveAndFlush(accountData);
+      return accountDataMapper.toGetAccountDataResponse(updatedAccountData);
     } catch (Exception e) {
       throw new InvalidDataException("Failed to update account data");
     }
@@ -75,11 +73,20 @@ public class AccountDataService {
   @Transactional
   public void deleteAccountData(Long id) {
     AccountData accountData =
-        accountDataRepository
-            .findById(id)
-            .orElseThrow(
-                () -> new AccountNotFoundException(id));
+        accountDataRepository.findById(id).orElseThrow(() -> new AccountNotFoundException(id));
     UserData user = accountData.getUserData();
     user.getAccount().remove(accountData);
+  }
+
+  private boolean isMatchingCurrency(AccountData account, String currency) {
+    return currency == null || currency.isEmpty() || account.getCurrency().equals(currency);
+  }
+
+  private boolean isMatchingType(AccountData account, String type) {
+    return type == null || type.isEmpty() || account.getType().equals(type);
+  }
+
+  private boolean isMatchingUser(AccountData account, Long userId) {
+    return userId == null || account.getUserData().getId().equals(userId);
   }
 }
