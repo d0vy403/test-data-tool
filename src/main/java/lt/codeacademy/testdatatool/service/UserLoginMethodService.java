@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lt.codeacademy.testdatatool.dto.CreateUserLoginMethodRequest;
 import lt.codeacademy.testdatatool.dto.GetUserLoginMethodResponse;
+import lt.codeacademy.testdatatool.entity.Method;
 import lt.codeacademy.testdatatool.entity.UserData;
 import lt.codeacademy.testdatatool.entity.UserLoginMethod;
 import lt.codeacademy.testdatatool.exception.InvalidDataException;
@@ -42,9 +43,10 @@ public class UserLoginMethodService {
     }
   }
 
-  public List<GetUserLoginMethodResponse> getUserLoginMethod() {
-    List<UserLoginMethod> userLoginMethods = userLoginMethodRespository.findAll();
-    return userLoginMethods.stream()
+  public List<GetUserLoginMethodResponse> getUserLoginMethod(Method method, Long userId) {
+    return userLoginMethodRespository.findAll().stream()
+        .filter(loginMethod -> isMatchingMethod(loginMethod, method))
+        .filter(loginMethod -> isMatchingUserId(loginMethod, userId))
         .map(userLoginMethodMapper::toGetUserLoginMethodResponse)
         .toList();
   }
@@ -65,5 +67,13 @@ public class UserLoginMethodService {
             .orElseThrow(() -> new UserLoginNotFoundException(id));
     UserData user = userLoginMethod.getUserData();
     user.getUserLoginMethod().remove(userLoginMethod);
+  }
+
+  private boolean isMatchingMethod(UserLoginMethod loginMethod, Method method) {
+    return method == null || loginMethod.getMethod().equals(method);
+  }
+
+  private boolean isMatchingUserId(UserLoginMethod loginMethod, Long userId) {
+    return userId == null || loginMethod.getUserData().getId().equals(userId);
   }
 }

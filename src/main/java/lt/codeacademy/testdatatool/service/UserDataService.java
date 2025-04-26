@@ -2,7 +2,6 @@ package lt.codeacademy.testdatatool.service;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lt.codeacademy.testdatatool.dto.CreateUserDataRequest;
 import lt.codeacademy.testdatatool.dto.GetUserDataResponse;
@@ -35,11 +34,14 @@ public class UserDataService {
   }
 
   @Transactional
-  public List<GetUserDataResponse> getUserData() {
-    List<UserData> userDataList = userDataRepository.findAll();
-    return userDataList.stream()
+  public List<GetUserDataResponse> getUserData(
+      String userName, Environment environment, Channel channel) {
+    return userDataRepository.findAll().stream()
+        .filter(user -> isMatchingUserName(user, userName))
+        .filter(user -> isMatchingEnvironment(user, environment))
+        .filter(user -> isMatchingChannel(user, channel))
         .map(userDataMapper::toGetUserDataResponse)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   public GetUserDataResponse getUserDataById(Long id) {
@@ -67,5 +69,17 @@ public class UserDataService {
       throw new UserNotFoundException(id);
     }
     userDataRepository.deleteById(id);
+  }
+
+  private boolean isMatchingUserName(UserData user, String userName) {
+    return userName == null || userName.isEmpty() || user.getUsername().equals(userName);
+  }
+
+  private boolean isMatchingEnvironment(UserData user, Environment environment) {
+    return environment == null || user.getEnvironment().equals(environment);
+  }
+
+  private boolean isMatchingChannel(UserData user, Channel channel) {
+    return channel == null || user.getChannel().equals(channel);
   }
 }
