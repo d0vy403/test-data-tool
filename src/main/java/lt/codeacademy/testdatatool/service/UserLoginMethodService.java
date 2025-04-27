@@ -14,13 +14,13 @@ import lt.codeacademy.testdatatool.exception.UserLoginNotFoundException;
 import lt.codeacademy.testdatatool.exception.UserNotFoundException;
 import lt.codeacademy.testdatatool.mapper.UserLoginMethodMapper;
 import lt.codeacademy.testdatatool.repository.UserDataRepository;
-import lt.codeacademy.testdatatool.repository.UserLoginMethodRespository;
+import lt.codeacademy.testdatatool.repository.UserLoginMethodRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserLoginMethodService {
-  private final UserLoginMethodRespository userLoginMethodRespository;
+  private final UserLoginMethodRepository userLoginMethodRepository;
   private final UserLoginMethodMapper userLoginMethodMapper;
   private final UserDataRepository userDataRepository;
 
@@ -29,14 +29,14 @@ public class UserLoginMethodService {
         userDataRepository
             .findById(request.userId())
             .orElseThrow(() -> new UserNotFoundException(request.userId()));
-    if (userLoginMethodRespository.existsByUserDataAndMethod(userData, request.method())) {
+    if (userLoginMethodRepository.existsByUserDataAndMethod(userData, request.method())) {
       throw new UserLoginAlreadyExistsException(request.userId());
     }
 
     try {
       UserLoginMethod userLoginMethod = userLoginMethodMapper.toUserLoginMethod(request);
       userLoginMethod.setUserData(userData);
-      userLoginMethodRespository.save(userLoginMethod);
+      userLoginMethodRepository.save(userLoginMethod);
       return userLoginMethodMapper.toGetUserLoginMethodResponse(userLoginMethod);
     } catch (Exception e) {
       throw new InvalidDataException("Failed to add user login method");
@@ -44,7 +44,7 @@ public class UserLoginMethodService {
   }
 
   public List<GetUserLoginMethodResponse> getUserLoginMethod(Method method, Long userId) {
-    return userLoginMethodRespository.findAll().stream()
+    return userLoginMethodRepository.findAll().stream()
         .filter(loginMethod -> isMatchingMethod(loginMethod, method))
         .filter(loginMethod -> isMatchingUserId(loginMethod, userId))
         .map(userLoginMethodMapper::toGetUserLoginMethodResponse)
@@ -53,7 +53,7 @@ public class UserLoginMethodService {
 
   public GetUserLoginMethodResponse getUserLoginMethodById(Long id) {
     UserLoginMethod userLoginMethod =
-        userLoginMethodRespository
+        userLoginMethodRepository
             .findById(id)
             .orElseThrow(() -> new UserLoginNotFoundException(id));
     return userLoginMethodMapper.toGetUserLoginMethodResponse(userLoginMethod);
@@ -62,7 +62,7 @@ public class UserLoginMethodService {
   @Transactional
   public void deleteUserLoginMethod(Long id) {
     UserLoginMethod userLoginMethod =
-        userLoginMethodRespository
+        userLoginMethodRepository
             .findById(id)
             .orElseThrow(() -> new UserLoginNotFoundException(id));
     UserData user = userLoginMethod.getUserData();

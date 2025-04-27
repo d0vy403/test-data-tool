@@ -5,6 +5,6 @@ import lt.codeacademy.testdatatool.entity.UserData;
 import lt.codeacademy.testdatatool.entity.UserLoginMethod;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserLoginMethodRespository extends JpaRepository<UserLoginMethod, Long> {
+public interface UserLoginMethodRepository extends JpaRepository<UserLoginMethod, Long> {
     boolean existsByUserDataAndMethod(UserData userData, Method method);
 }

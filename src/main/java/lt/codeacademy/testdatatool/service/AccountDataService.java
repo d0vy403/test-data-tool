@@ -45,11 +45,11 @@ public class AccountDataService {
 
   public List<GetAccountDataResponse> getAccountData(String currency, String type, Long userId) {
     return accountDataRepository.findAll().stream()
-            .filter(account -> isMatchingCurrency(account, currency))
-            .filter(account -> isMatchingType(account, type))
-            .filter(account -> isMatchingUser(account, userId))
-            .map(accountDataMapper::toGetAccountDataResponse)
-            .toList();
+        .filter(account -> isMatchingCurrency(account, currency))
+        .filter(account -> isMatchingType(account, type))
+        .filter(account -> isMatchingUser(account, userId))
+        .map(accountDataMapper::toGetAccountDataResponse)
+        .toList();
   }
 
   public GetAccountDataResponse getAccountDataById(Long id) {
