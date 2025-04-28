@@ -19,6 +19,6 @@ public class UserLoginMethod {
   @Column(nullable = false)
   private Method method;
 
-  @ManyToOne
+  @ManyToOne(optional = false)
   private UserData userData;
 }
